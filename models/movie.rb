@@ -58,12 +58,21 @@ class Movie
     return stars.map {|star| Star.new(star)}
   end
 
-  def budget_count()
-    sql = "SELECT COUNT movies.* FROM movies INNER JOIN castings ON movies.budget -= castings.fee WHERE castings.movie_id = $1"
-    values = [@id]
-    budget_count = budget { |fee| fee }
-    return budget_count
-  end
+  #Frasers solution
+  def remaining_budget()
+   sql = "SELECT SUM(castings.fee) FROM castings WHERE castings.movie_id = $1"
+   values = [@id]
+   result = SqlRunner.run(sql, values).first
+   return @budget - result['sum'].to_i
+ end
+
+ # #Not working
+ # def budget_count()
+ #   sql = "SELECT COUNT movies.* FROM movies INNER JOIN castings ON movies.budget = castings.fee WHERE castings.movie_id = $1"
+ #   values = [@id]
+ #   budget_count = budget { |fee| fee }
+ #   return @budget - budget_count   #budget count is now equal to budget
+ # end
 
 
 end
